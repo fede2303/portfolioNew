@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Biglietti — Federico De Giovanni</title>
+    <meta name="description" content="Progetto E-Commerce Biglietti: sistema Java + MySQL per la vendita di biglietti con gruppi utenti e chat integrata.">
+    <meta property="og:title" content="E-Commerce Biglietti — Federico De Giovanni">
+    <meta property="og:description" content="Sistema Java + MySQL per vendita biglietti, gruppi evento e bacheca di gruppo.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<header>
+    <div class="container">
+        <h1><a href="index.html">FDG<span>.</span>dev</a></h1>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<section class="project-page">
+    <div class="container">
+
+        <div class="reveal">
+            <h2>E-Commerce Biglietti</h2>
+            <div class="tags" style="margin-bottom:2rem;">
+                <span>Java</span><span>MySQL</span><span>Eclipse</span>
+            </div>
+        </div>
+
+        <div class="project-details">
+
+            <h3>Il Problema</h3>
+            <p>
+                La necessità era creare un sistema che gestisse non solo la vendita di biglietti, ma anche la logica di
+                raggruppamento di utenti per uno stesso evento. Chiunque può creare un gruppo o entrare come membro in un
+                gruppo già esistente, e all'interno del gruppo è possibile chattare con gli altri partecipanti per organizzarsi in loco.
+            </p>
+
+            <h3>Codice Java</h3>
+            <p>Scarica il file sorgente Java del progetto:</p>
+            <a href="src.zip/" download class="btn" style="margin-top:.5rem; display:inline-flex;">
+                Scarica File Sorgente
+            </a>
+
+            <h3>Struttura Database (Schema)</h3>
+            <p>Codice SQL per la creazione delle tabelle principali:</p>
+
+            <pre class="code-box"><code>
+CREATE DATABASE TT;
+USE TT;
+
+CREATE TABLE Utenti (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    username        VARCHAR(50)  NOT NULL UNIQUE,
+    password        VARCHAR(255) NOT NULL,
+    data_creazione  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ruolo           VARCHAR(50)
+);
+
+CREATE TABLE Eventi (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    nome            VARCHAR(100) NOT NULL,
+    descrizione     TEXT,
+    data_evento     DATETIME NOT NULL,
+    luogo           VARCHAR(100),
+    organizzatore_id INT,
+    prezzo          DECIMAL(10, 2),
+    FOREIGN KEY (organizzatore_id) REFERENCES Utenti(id)
+);
+
+CREATE TABLE Gruppi (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    nome_gruppo VARCHAR(100) NOT NULL,
+    descrizione TEXT,
+    creatore_id INT,
+    evento_id   INT,
+    FOREIGN KEY (creatore_id) REFERENCES Utenti(id),
+    FOREIGN KEY (evento_id)   REFERENCES Eventi(id)
+);
+
+CREATE TABLE Membri (
+    id        INT AUTO_INCREMENT PRIMARY KEY,
+    gruppo_id INT,
+    utente_id INT,
+    ruolo     VARCHAR(50),
+    FOREIGN KEY (gruppo_id) REFERENCES Gruppi(id),
+    FOREIGN KEY (utente_id) REFERENCES Utenti(id)
+);
+
+CREATE TABLE Bacheca (
+    id                INT AUTO_INCREMENT PRIMARY KEY,
+    gruppo_id         INT,
+    utente_id         INT,
+    messaggio         TEXT NOT NULL,
+    data_pubblicazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (gruppo_id) REFERENCES Gruppi(id),
+    FOREIGN KEY (utente_id) REFERENCES Utenti(id)
+);
+            </code></pre>
+
+            <h3>Popolamento Database</h3>
+            <p>Dati di test per l'avvio rapido del sistema:</p>
+
+            <pre class="code-box"><code>
+USE TT;
+
+INSERT INTO Utenti (id, username, password, ruolo) VALUES
+(1,  'marioRossi',  'password123', 'utente'),
+(2,  'annaBianchi', 'securepass',  'utente'),
+(14, 'fede',        'fede',        'admin');
+
+INSERT INTO Eventi (nome, descrizione, data_evento, luogo, organizzatore_id, prezzo) VALUES
+('Concerto Rock',      'Serata rock',      '2025-03-15 20:00:00', 'Milano Arena', 1, 100),
+('Festival del Cinema','Film indipendenti','2025-04-10 18:30:00', 'Roma Cineplex', 2, 12),
+('Concerto Jazz',      'Jazz internazionale','2025-03-20 21:00:00','Blue Note MI', 3, 85);
+
+INSERT INTO Gruppi (nome_gruppo, descrizione, creatore_id, evento_id) VALUES
+('Rock Fans',    'Appassionati di musica rock.',     1, 1),
+('Cinema Lovers','Discutiamo i film del Festival.',   2, 2),
+('Jazz Club',    'Amanti del jazz, unitevi!',         3, 3);
+            </code></pre>
+
+            <h3>Screenshot</h3>
+            <img src="login.PNG"    alt="Login screen"    class="project-img" loading="lazy">
+            <img src="eventi.PNG"   alt="Events screen"   class="project-img" loading="lazy">
+            <img src="pagamento.PNG" alt="Payment screen" class="project-img" loading="lazy">
+
+        </div>
+
+        <a href="index.html#progetti" class="back-link">&larr; Torna ai Progetti</a>
+
+    </div>
+</section>
+
+<footer>
+    <p>© 2026 Federico De Giovanni</p>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
